@@ -131,7 +131,7 @@ Após realizar o ataque, vemos que o nome do usuário foi alterado sem o seu con
 * **CWE:** CWE-636
 * **Localização:** `http://localhost:3000/#/basket`
 * **Descrição:** O teste focou em obter controle sobre as dependências de compras de um usuário alvo. O ID do carrinho de compras foi descoberto por meio de um ataque de intrusão com uma lista numérica simples, indicando que os IDs seguiam um padrão facilmente adivinhável.
-* **Evidências:* A imagem abaixo representa o carrinho de compras antes do ataque e possuindo apenas um produto de ID 4.
+* **Evidências:** A imagem abaixo representa o carrinho de compras antes do ataque e possuindo apenas um produto de ID 4.
   
 <img width="537" height="291" alt="Image" src="https://github.com/user-attachments/assets/fa6ee9ef-c745-4bd9-bc13-a3dabc461d3c" />
 
@@ -155,7 +155,7 @@ Status do carrinho de compras depois de inserir 5 produtos em sua cesta sem o co
 * **CWE:** CWE-89
 * **Localização:** `http://localhost:3000/#/login`
 * **Descrição:** Uma injeção SQL na área de login permitiu burlar a autenticação por senha e adquirir acesso não autorizado à primeira conta de usuário registrada (administrador).
-* **Evidências:* O código SQL é inserido na área de login para manipular a lógica de consulta do banco de dados e adquirir acesso não autorizado à primeira conta de usuário registrada, no caso a seguir, é o administrador.
+* **Evidências:** O código SQL é inserido na área de login para manipular a lógica de consulta do banco de dados e adquirir acesso não autorizado à primeira conta de usuário registrada, no caso a seguir, é o administrador.
   
  <img width="768" height="455" alt="Image" src="https://github.com/user-attachments/assets/db8639e3-7eb2-42ee-94c5-04c2f23e8614" />
  

@@ -74,6 +74,7 @@ Foram aplicadas metodologias e padrões reconhecidos na área de segurança cibe
 * **Descrição:** Utilizando o Burp Suite, foi possível capturar e modificar requisições HTTP relacionadas ao depósito de moeda virtual. Isso permitiu a inserção de valores absurdos na carteira digital para realizar compras na plataforma de e-commerce.
 * **Evidências:** Ao interceptar o protocolo POST para a quantidade depositada na carteira digital, o valor foi alterado, e o mesmo ID da transação foi reutilizado para validar o novo valor. Isso demonstra que a aplicação confiava apenas no ID da transação para validar o depósito, sem verificar a consistência do valor ou a autenticidade da alteração.
 Como segue o exemplo da imagem abaixo:
+
 <img width="990" height="518" alt="Image" src="https://github.com/user-attachments/assets/c8b7265d-0cf3-404f-9fc4-c89ba5bdebff" />
 
 * **Recomendações:**
@@ -89,9 +90,11 @@ Como segue o exemplo da imagem abaixo:
 * **Localização:** `http://localhost:3000/#/login`
 * **Descrição:** A ferramenta Burp Suite foi utilizada para realizar um ataque de força bruta contra usuários do Juice Shop, utilizando uma wordlist de senhas e e-mail encontradas na própria aplicação web. A ausência de mecanismos que restrinjam as tentativas de login facilitou este ataque.
 * **Evidências:** Foi realizado uma interação com aplicação web para capturar a requisição HTTP POST responsável por enviar autenticação ao sistema, em seguida, usando a ferramenta Burp Suite, foi inicializado um ataque de força bruta com uma wordlist com senhas e e-mails de usuários.
+  
 <img width="774" height="600" alt="Image" src="https://github.com/user-attachments/assets/f5b65bd3-ce41-44bb-86b5-e4d87a535574" />
 
 status code 200 para a combinação "admin" e "admin123" (Payload 1: "admin", Payload 2: "admin123") indica um login bem-sucedido, confirmando a vulnerabilidade. Isso permitiu o acesso como administrador.
+
 <img width="795" height="612" alt="Image" src="https://github.com/user-attachments/assets/bd8b59d7-1362-4060-89c9-713c01e44b35" />
 
 * **Recomendações:**
@@ -106,12 +109,15 @@ status code 200 para a combinação "admin" e "admin123" (Payload 1: "admin", Pa
 * **Localização:** `http://localhost:3000/#/profile`
 * **Descrição:**  O ataque visou o usuário com ID 2. Foi possível modificar o token JWT para remover sua assinatura digital e alterar o nome de usuário através de uma requisição POST. A falta de validação da assinatura permitiu essa adulteração.
 * **Evidências:** O token JWT foi descriptografado e alterado para não possuir assinatura digital ("alg":"none") e foi manipulado o seu id (“id”:2)
+  
 <img width="649" height="353" alt="Image" src="https://github.com/user-attachments/assets/c334fbd5-a20a-41c7-be82-74611dbab0e1" />
 
 A requisição POST para /profile recebe o token adulterado e o nome do usuário é alterado com sucesso para “hackeando2”. 
+
 <img width="705" height="499" alt="Image" src="https://github.com/user-attachments/assets/ccf1d0fa-1200-4643-aa73-de532b13b236" />
 
 Após realizar o ataque, vemos que o nome do usuário foi alterado sem o seu consentimento.
+
 <img width="605" height="486" alt="Image" src="https://github.com/user-attachments/assets/ca6f97a8-29da-4f34-98ab-451a335dd17b" />
 
 * **Recomendações:**
@@ -125,14 +131,17 @@ Após realizar o ataque, vemos que o nome do usuário foi alterado sem o seu con
 * **CWE:** CWE-636
 * **Localização:** `http://localhost:3000/#/basket`
 * **Descrição:** O teste focou em obter controle sobre as dependências de compras de um usuário alvo. O ID do carrinho de compras foi descoberto por meio de um ataque de intrusão com uma lista numérica simples, indicando que os IDs seguiam um padrão facilmente adivinhável.
-* **Evidências:* A imagem abaixo representa o carrinho de compras antes do ataque e possuindo apenas um produto de ID 4. 
+* **Evidências:* A imagem abaixo representa o carrinho de compras antes do ataque e possuindo apenas um produto de ID 4.
+  
 <img width="537" height="291" alt="Image" src="https://github.com/user-attachments/assets/fa6ee9ef-c745-4bd9-bc13-a3dabc461d3c" />
 
 Após interação com o usuário logado na aplicação, é capturado a requisição POST responsável por adicionar os itens através de um JSON. 
 O sistema de segurança analisa o JSON, mas não válida múltiplos parâmetros contendo o valor do BasketID e por essa razão duplicamos essa informação, sendo o primeiro usado para passar pelo teste de validação e o segundo para ser o alvo da adulteração indevida. 
+
 <img width="892" height="676" alt="Image" src="https://github.com/user-attachments/assets/a416c24a-65ff-414f-9cd8-71aa3bd90cbe" />
 
 Status do carrinho de compras depois de inserir 5 produtos em sua cesta sem o consentimento do usuário. 
+
 <img width="591" height="559" alt="Image" src="https://github.com/user-attachments/assets/3a24bbf7-458c-4704-b328-1d304f1e1edd" />
 
 * **Recomendações:**
@@ -146,7 +155,8 @@ Status do carrinho de compras depois de inserir 5 produtos em sua cesta sem o co
 * **CWE:** CWE-89
 * **Localização:** `http://localhost:3000/#/login`
 * **Descrição:** Uma injeção SQL na área de login permitiu burlar a autenticação por senha e adquirir acesso não autorizado à primeira conta de usuário registrada (administrador).
-* **Evidências:* O código SQL é inserido na área de login para manipular a lógica de consulta do banco de dados e adquirir acesso não autorizado à primeira conta de usuário registrada, no caso a seguir, é o administrador. 
+* **Evidências:* O código SQL é inserido na área de login para manipular a lógica de consulta do banco de dados e adquirir acesso não autorizado à primeira conta de usuário registrada, no caso a seguir, é o administrador.
+  
  <img width="768" height="455" alt="Image" src="https://github.com/user-attachments/assets/db8639e3-7eb2-42ee-94c5-04c2f23e8614" />
  
 * **Recomendações:**

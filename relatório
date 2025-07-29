@@ -1,0 +1,145 @@
+# Relatório de Teste de Invasão - OWASP Juice Shop 🔒
+
+Este relatório apresenta os resultados obtidos com o teste de invasão ao Juice shop do tipo e-commerce para a OWASP. As recomendações deste relatório estão estruturadas para permitir a remediação dos riscos de segurança identificados. Este documento visa a formalização das ações tomadas no referido teste.
+Os critérios de avaliação de riscos utilizados durante as atividades consideram as descobertas feitas, bem como os critérios de segurança padrão aceitos na área de segurança.
+Este documento recomenda fortemente a revisão dos riscos para o negócio assim como as recomendações de alto nível para uma melhor compreensão dos riscos e questões de segurança descobertas.
+
+
+---
+
+## Sumário Executivo 📝
+
+Os testes de penetração na aplicação web Juice Shop revelaram vulnerabilidades significativas que comprometem a confidencialidade, integridade e disponibilidade dos dados, além de afetar a autenticidade das ações do usuário. As principais descobertas incluem:
+
+* **Vazamento e Manipulação de Dados Sensíveis:** Possibilidade de acesso e alteração de informações de usuários e seus carrinhos de compra através de IDs armazenados em tokens JWT.
+* **Sequestro de Sessão e Acesso Não Autorizado:** Falta de validação de dados e autenticação precária permitiram ataques de força bruta e injeção SQL, culminando em acesso não autorizado à conta de administrador.
+
+Essas vulnerabilidades impactam diretamente os pilares da segurança:
+
+* **Confidencialidade:** Dados sensíveis de usuários e administradores podem ser acessados e expostos.
+* **Integridade:** Dados podem ser alterados sem autorização.
+* **Disponibilidade:** Embora não explorados no relatório, a aplicação é suscetível a ataques DDoS.
+* **Autenticidade:** Falhas na autenticação segura dos usuários tornam a aplicação vulnerável.
+
+### Severidade das Vulnerabilidades 📊
+
+A severidade das vulnerabilidades foi determinada de acordo com os critérios do CVSS3.1.
+
+| Severidade | Quantidade |
+| :--------- | :--------- |
+| Alta       | 5          |
+| Média      | 0          |
+| Baixa      | 0          |
+
+---
+
+## Recomendações de Alto Nível 💡
+
+Com base nas descobertas, são urgentemente recomendadas as seguintes ações para aprimorar as práticas de segurança da aplicação:
+
+* **Validação Rigorosa de Dados:** Implementar validação rigorosa na entrada e saída de dados, juntamente com mecanismos de segurança para comunicações cliente-servidor, criptografando e ocultando o grande volume de informações geradas pelos protocolos HTTP.
+* **Fortalecimento da Autenticação:** Reforçar a segurança dos mecanismos de autenticação, adicionando camadas extras de MFA, implementando políticas de senhas fortes, limitando tentativas de login e garantindo que as senhas sejam armazenadas e criptografadas de forma segura utilizando hashing.
+* **Gerenciamento de Tokens JWT:** Evitar o uso de IDs sequenciais ou facilmente adivinháveis em tokens para manipulação de dados, definindo assinaturas para criptografar os tokens JWT.
+* **Monitoramento Contínuo:** Implementar auditorias e monitoramentos contínuos dos logs de segurança, registrando eventos importantes e buscando meios de mitigar novas vulnerabilidades.
+* **Conformidade OWASP Top 10:** Definir regras baseadas no OWASP Top 10, priorizando autenticação e proteção de dados sensíveis.
+
+---
+
+## Ferramentas Utilizadas 🛠️
+
+As seguintes ferramentas foram empregadas durante os testes:
+* VMBox
+* Kali Linux
+* Burp Suite
+* Docker
+
+---
+
+## Metodologia 📖
+
+Foram aplicadas metodologias e padrões reconhecidos na área de segurança cibernética:
+
+* OWASP Testing Guide
+* OWASP Top 10 Application Security Risks - 2021
+
+---
+
+## Detalhes Técnicos das Descobertas 
+
+### 1. Business Logic Errors (Erros de Lógica de Negócio)
+
+* **Severidade (CVSS3.1):** 8.1 (Alta)
+* **CWE:** CWE-840
+* **Localização:** `http://localhost:3000/#/wallet`
+* **Descrição:** Utilizando o Burp Suite, foi possível capturar e modificar requisições HTTP relacionadas ao depósito de moeda virtual. Isso permitiu a inserção de valores absurdos na carteira digital para realizar compras na plataforma de e-commerce.
+* **Evidências:** Ao interceptar o protocolo POST para a quantidade depositada na carteira digital, o valor foi alterado, e o mesmo ID da transação foi reutilizado para validar o novo valor. Isso demonstra que a aplicação confiava apenas no ID da transação para validar o depósito, sem verificar a consistência do valor ou a autenticidade da alteração.
+Como segue o exemplo da imagem abaixo:
+[img.png]
+* **Recomendações:**
+    * Implementar validação do lado do servidor para todos os valores de transação.
+    * Verificar a consistência entre o ID da transação e o valor associado.
+    * Adicionar mecanismos de controle de integridade para evitar adulterações.
+    * Monitoramento constante de possíveis suspeitas no sistema.
+
+### 2. Improper Restriction of Excessive Authentication Attempts (Restrição Imprópria de Tentativas Excessivas de Autenticação)
+
+* **Severidade (CVSS3.1):** 8.3 (Alta)
+* **CWE:** CWE-307
+* **Localização:** `http://localhost:3000/#/login`
+* **Descrição:** A ferramenta Burp Suite foi utilizada para realizar um ataque de força bruta contra usuários do Juice Shop, utilizando uma wordlist de senhas e e-mail encontradas na própria aplicação web. A ausência de mecanismos que restrinjam as tentativas de login facilitou este ataque.
+* **Evidências:** Primeiro foi realizado uma interação com aplicação web para capturar a requisição HTTP POST responsável por enviar autenticação ao sistema, em seguida, usando a ferramenta Burp Suite, foi inicializado um ataque de força bruta com uma wordlist com senhas e e-mails de usuários.
+ [img.png]
+status code 200 para a combinação "admin" e "admin123" (Payload 1: "admin", Payload 2: "admin123") indica um login bem-sucedido, confirmando a vulnerabilidade. Isso permitiu o acesso como administrador.
+ [img.png]
+* **Recomendações:**
+    * Utilização de captchas.
+    * Bloqueio de IP ou origem após um número pré-definido de tentativas falhas.
+    * Autenticação MFA.
+
+### 3. Generation of Incorrect Security (Geração de Segurança Incorreta)
+
+* **Severidade (CVSS3.1):** 7.1 (Alta)
+* **CWE:** CWE-1270
+* **Localização:** `http://localhost:3000/#/profile`
+* **Descrição:**  O ataque visou o usuário com ID 2. Foi possível modificar o token JWT para remover sua assinatura digital e alterar o nome de usuário através de uma requisição POST. A falta de validação da assinatura permitiu essa adulteração.
+* **Evidências:** O token JWT foi descriptografado e alterado para não possuir assinatura digital ("alg":"none") e foi manipulado o seu id (“id”:2)
+ [img.png]
+A requisição POST para /profile recebe o token adulterado e o nome do usuário é alterado com sucesso para “hackeando2”. 
+ [img.png]
+Após realizar o ataque, vemos que o nome do usuário foi alterado sem o seu consentimento.
+ [img.png]
+* **Recomendações:**
+    * O token deve ser sempre validado com o algoritmo definido na aplicação.
+    * Implementar assinaturas criptográficas robustas para todos os tokens JWT.
+    * Verificar a assinatura antes de processar qualquer informação contida no token.
+
+### 4. Authorization Bypass Through User-Controlled Key (Bypass de Autorização Através de Chave Controlada pelo Usuário)
+
+* **Severidade (CVSS3.1):** 7.1 (Alta)
+* **CWE:** CWE-636
+* **Localização:** `http://localhost:3000/#/basket`
+* **Descrição:** O teste focou em obter controle sobre as dependências de compras de um usuário alvo. O ID do carrinho de compras foi descoberto por meio de um ataque de intrusão com uma lista numérica simples, indicando que os IDs seguiam um padrão facilmente adivinhável.
+* **Evidências:* A imagem abaixo representa o carrinho de compras antes do ataque e possuindo apenas um produto de ID 4. 
+ [img.png]
+Após interação com o usuário logado na aplicação, é capturado a requisição POST responsável por adicionar os itens através de um JSON. 
+O sistema de segurança analisa o JSON, mas não válida múltiplos parâmetros contendo o valor do BasketID e por essa razão duplicamos essa informação, sendo o primeiro usado para passar pelo teste de validação e o segundo para ser o alvo da adulteração indevida. 
+ [img.png]
+Status do carrinho de compras depois de inserir 5 produtos em sua cesta sem o consentimento do usuário. 
+ [img.png]
+* **Recomendações:**
+    * Verificar a autorização de acesso do usuário a um objeto.
+    * Utilizar IDs imprevisíveis (GUIDs/UUIDs) para identificadores de recursos sensíveis.
+    * Implementar verificações de permissão baseadas na sessão do usuário e não apenas em IDs de recursos.
+
+### 5. SQL Injection
+
+* **Severidade (CVSS3.1):** 8.1 (Alta)
+* **CWE:** CWE-89
+* **Localização:** `http://localhost:3000/#/login`
+* **Descrição:** Uma injeção SQL na área de login permitiu burlar a autenticação por senha e adquirir acesso não autorizado à primeira conta de usuário registrada (administrador).
+* **Evidências:* O código SQL é inserido na área de login para manipular a lógica de consulta do banco de dados e adquirir acesso não autorizado à primeira conta de usuário registrada, no caso a seguir, é o administrador. 
+ [img.png] 
+* **Recomendações:**
+    * Utilizar consultas parametrizadas (prepared statements) para todas as interações com o banco de dados. Isso garante que a entrada do usuário seja tratada como dados e não como código SQL.
+    * Implementar validação de entrada rigorosa para todos os campos que interagem com o banco de dados.
+    * Evitar a concatenação direta de strings de entrada do usuário em consultas SQL.
